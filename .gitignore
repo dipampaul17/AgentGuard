@@ -1,0 +1,50 @@
+# Dependencies
+node_modules/
+npm-debug.log*
+yarn-debug.log*
+yarn-error.log*
+
+# Runtime & Logs
+*.log
+.env*
+
+# IDE & Editor
+.vscode/
+.idea/
+.cursor/
+*.swp
+*.swo
+*.sublime-*
+
+# OS Generated
+.DS_Store
+.DS_Store?
+._*
+.Spotlight-V100
+.Trashes
+ehthumbs.db
+Thumbs.db
+
+# Development & Internal
+PRODUCTION_REALITY.md
+DEMO_RESULTS.md
+production-test.js
+*-test.js
+test-*.js
+test-npm-package.js
+
+# Build artifacts
+build/
+*.tgz
+*.tar.gz
+
+# Testing & Coverage
+coverage/
+.nyc_output/
+
+# Cache files
+.agentguard-cache.json
+*.cache
+
+# IDE & Editor (additional)
+.cursor/

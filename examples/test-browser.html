@@ -1,0 +1,283 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>AgentGuard Browser Example</title>
+    <style>
+        body {
+            font-family: 'Monaco', 'Menlo', 'Ubuntu Mono', monospace;
+            background: #1a1a1a;
+            color: #00ff00;
+            padding: 20px;
+            line-height: 1.6;
+        }
+        .container {
+            max-width: 800px;
+            margin: 0 auto;
+        }
+        .terminal {
+            background: #000;
+            border: 1px solid #333;
+            border-radius: 8px;
+            padding: 20px;
+            margin: 20px 0;
+            overflow-y: auto;
+            height: 300px;
+        }
+        button {
+            background: #333;
+            color: #00ff00;
+            border: 1px solid #555;
+            padding: 10px 20px;
+            margin: 5px;
+            border-radius: 4px;
+            cursor: pointer;
+            font-family: inherit;
+        }
+        button:hover {
+            background: #555;
+        }
+        .cost-display {
+            position: fixed;
+            top: 20px;
+            right: 20px;
+            background: rgba(0, 0, 0, 0.8);
+            color: #00ff00;
+            padding: 10px;
+            border-radius: 6px;
+            font-weight: bold;
+            z-index: 1000;
+        }
+        .warning {
+            color: #ffaa00;
+        }
+        .error {
+            color: #ff4444;
+        }
+        .success {
+            color: #44ff44;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h1>🛡️ AgentGuard Browser Example</h1>
+        
+        <p>This page demonstrates AgentGuard protecting against expensive AI agent loops in the browser.</p>
+        
+        <div class="cost-display" id="cost-display">
+            💸 $0.00 / $10.00
+        </div>
+
+        <div>
+            <button onclick="initAgentGuard()">🚀 Initialize AgentGuard</button>
+            <button onclick="simulateExpensiveCall()">💸 Simulate Expensive API Call</button>
+            <button onclick="simulateLoop()">🔥 Simulate Runaway Loop</button>
+            <button onclick="resetCosts()">🔄 Reset Costs</button>
+            <button onclick="showStatus()">📊 Show Status</button>
+        </div>
+
+        <div class="terminal" id="terminal">
+            <div>Welcome to AgentGuard Browser Example</div>
+            <div>Click "Initialize AgentGuard" to start...</div>
+        </div>
+    </div>
+
+    <!-- Option 1: Local file (for this example) -->
+    <script src="../agent-guard.js"></script>
+    
+    <!-- Option 2: CDN (for production) -->
+    <!-- <script src="https://unpkg.com/agent-guard@latest/agent-guard.js"></script> -->
+    
+    <!-- Option 3: Download and host yourself -->
+    <!-- <script src="./agent-guard.js"></script> -->
+    <script>
+        let guard = null;
+        let terminal = document.getElementById('terminal');
+        let loopRunning = false;
+
+        function log(message, className = '') {
+            const div = document.createElement('div');
+            div.textContent = `[${new Date().toLocaleTimeString()}] ${message}`;
+            if (className) div.className = className;
+            terminal.appendChild(div);
+            terminal.scrollTop = terminal.scrollHeight;
+        }
+
+        function initAgentGuard() {
+            try {
+                guard = AgentGuard.init({
+                    limit: 10.0,
+                    silent: false,
+                    webhook: null // Could set up a webhook here
+                });
+                
+                log('✅ AgentGuard initialized with $10 limit', 'success');
+                log('💡 The floating widget should appear in the top-right corner');
+                
+                // Override the original console.log to show in our terminal too
+                const originalConsoleLog = console.log;
+                console.log = function(...args) {
+                    originalConsoleLog.apply(console, args);
+                    if (args.length > 0 && typeof args[0] === 'object') {
+                        log('🤖 API Response detected and processed');
+                    }
+                };
+                
+            } catch (error) {
+                log('❌ Failed to initialize AgentGuard: ' + error.message, 'error');
+            }
+        }
+
+        function simulateExpensiveCall() {
+            if (!guard) {
+                log('⚠️ Please initialize AgentGuard first', 'warning');
+                return;
+            }
+
+            // Simulate a GPT-4 API response
+            const fakeResponse = {
+                id: 'chatcmpl-' + Math.random().toString(36).substr(2, 9),
+                object: 'chat.completion',
+                model: 'gpt-4',
+                usage: {
+                    prompt_tokens: Math.floor(Math.random() * 1000) + 500,
+                    completion_tokens: Math.floor(Math.random() * 1500) + 800,
+                    total_tokens: 0
+                },
+                choices: [{
+                    message: {
+                        role: 'assistant',
+                        content: 'This is a simulated expensive API response. In a real scenario, this would represent a costly AI model call that could add up quickly in a loop.'
+                    },
+                    finish_reason: 'stop'
+                }]
+            };
+
+            fakeResponse.usage.total_tokens = fakeResponse.usage.prompt_tokens + fakeResponse.usage.completion_tokens;
+
+            log(`📞 Simulating ${fakeResponse.model} call (${fakeResponse.usage.total_tokens} tokens)`);
+            
+            // This triggers AgentGuard's console interceptor
+            console.log('API Response:', fakeResponse);
+            
+            log(`💰 Current cost: $${guard.getCost().toFixed(4)}`);
+        }
+
+        function simulateLoop() {
+            if (!guard) {
+                log('⚠️ Please initialize AgentGuard first', 'warning');
+                return;
+            }
+
+            if (loopRunning) {
+                log('⚠️ Loop already running', 'warning');
+                return;
+            }
+
+            loopRunning = true;
+            log('🔥 Starting runaway loop simulation...', 'warning');
+            log('🛡️ AgentGuard should kill this when cost hits $10');
+
+            let callCount = 0;
+            const interval = setInterval(() => {
+                if (!loopRunning) {
+                    clearInterval(interval);
+                    return;
+                }
+
+                callCount++;
+                
+                // Simulate increasingly expensive calls
+                const fakeResponse = {
+                    id: 'chatcmpl-loop-' + callCount,
+                    object: 'chat.completion',
+                    model: Math.random() > 0.5 ? 'gpt-4' : 'claude-3-opus',
+                    usage: {
+                        prompt_tokens: Math.floor(Math.random() * 2000) + 1000,
+                        completion_tokens: Math.floor(Math.random() * 3000) + 1500,
+                        total_tokens: 0
+                    },
+                    choices: [{
+                        message: {
+                            role: 'assistant',
+                            content: `Loop iteration ${callCount}: This is getting expensive...`
+                        },
+                        finish_reason: 'stop'
+                    }]
+                };
+
+                fakeResponse.usage.total_tokens = fakeResponse.usage.prompt_tokens + fakeResponse.usage.completion_tokens;
+
+                log(`🔄 Loop call ${callCount}: ${fakeResponse.model} (${fakeResponse.usage.total_tokens} tokens)`);
+                console.log('Expensive loop call:', fakeResponse);
+
+                // Check if we should stop (AgentGuard might have killed us)
+                if (guard.getCost() >= guard.getLimit()) {
+                    loopRunning = false;
+                    clearInterval(interval);
+                    log('🛑 Loop stopped by cost limit!', 'error');
+                }
+
+            }, 800); // Call every 800ms
+
+            // Safety timeout
+            setTimeout(() => {
+                if (loopRunning) {
+                    loopRunning = false;
+                    clearInterval(interval);
+                    log('⏰ Loop stopped by safety timeout', 'warning');
+                }
+            }, 30000); // Stop after 30 seconds max
+        }
+
+        function resetCosts() {
+            if (!guard) {
+                log('⚠️ Please initialize AgentGuard first', 'warning');
+                return;
+            }
+
+            guard.reset();
+            log('🔄 Costs reset to $0.00', 'success');
+            loopRunning = false;
+        }
+
+        function showStatus() {
+            if (!guard) {
+                log('⚠️ Please initialize AgentGuard first', 'warning');
+                return;
+            }
+
+            log('📊 AgentGuard Status:');
+            log(`   💰 Current cost: $${guard.getCost().toFixed(4)}`);
+            log(`   🎯 Cost limit: $${guard.getLimit()}`);
+            log(`   📞 API calls logged: ${guard.getLogs().length}`);
+            
+            const logs = guard.getLogs();
+            if (logs.length > 0) {
+                log('📋 Recent calls:');
+                logs.slice(-5).forEach((entry, i) => {
+                    log(`   ${i+1}. ${entry.model}: $${entry.cost.toFixed(4)} (${entry.tokens.input + entry.tokens.output} tokens)`);
+                });
+            }
+        }
+
+        // Auto-initialize on page load
+        window.addEventListener('load', () => {
+            log('🌐 Page loaded. Ready for AgentGuard example.');
+            log('💡 This simulates browser-based AI agents that could run expensive loops.');
+        });
+
+        // Simulate page reload when AgentGuard kills the process
+        const originalReload = window.location.reload;
+        window.location.reload = function() {
+            log('🛑 AgentGuard triggered page reload (process kill simulation)', 'error');
+            setTimeout(() => {
+                originalReload.call(window.location);
+            }, 2000);
+        };
+
+    </script>
+</body>
+</html>

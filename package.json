@@ -1,0 +1,69 @@
+{
+  "name": "agent-guard",
+  "version": "1.2.2",
+  "description": "Autonomous AI cost protection that actually works. Real-time budget enforcement with auto-kill prevents runaway LLM costs before they happen. Unlike monitoring tools, AgentGuard stops the bleeding.",
+  "main": "agent-guard.js",
+  "keywords": [
+    "ai",
+    "agent",
+    "cost-control",
+    "openai",
+    "anthropic",
+    "claude",
+    "llm",
+    "budget",
+    "auto-kill",
+    "protection",
+    "monitoring",
+    "prevention",
+    "runaway-costs",
+    "real-time"
+  ],
+  "author": "AgentGuard Team",
+  "license": "MIT",
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/dipampaul17/AgentGuard.git"
+  },
+  "bugs": {
+    "url": "https://github.com/dipampaul17/AgentGuard/issues"
+  },
+  "homepage": "https://github.com/dipampaul17/AgentGuard",
+  "engines": {
+    "node": ">=16.0.0"
+  },
+  "dependencies": {
+    "@anthropic-ai/tokenizer": "^0.0.4",
+    "tiktoken": "^1.0.21"
+  },
+  "optionalDependencies": {
+    "redis": "^4.6.13"
+  },
+  "devDependencies": {
+    "jest": "^29.7.0"
+  },
+  "scripts": {
+    "test": "jest --detectOpenHandles --forceExit",
+    "test:ci": "jest --testPathPattern=agent-guard.test.js --ci --coverage --detectOpenHandles --forceExit --maxWorkers=1",
+    "test:watch": "jest --watch",
+    "build": "node build.js",
+    "verify": "node verify-installation.js",
+    "example": "node examples/example-usage.js",
+    "example:runaway": "node examples/runaway-loop-demo.js",
+    "example:langchain": "node examples/langchain-example.js",
+    "benchmark": "node benchmarks/performance.js",
+    "benchmark:gc": "node --expose-gc benchmarks/performance.js",
+    "prepublishOnly": "npm run test:ci && npm run build"
+  },
+  "files": [
+    "agent-guard.js",
+    "agent-guard.d.ts",
+    "README.md",
+    "QUICKSTART.md",
+    "API.md",
+    "verify-installation.js",
+    "examples/",
+    "dist/"
+  ],
+  "types": "agent-guard.d.ts"
+}
