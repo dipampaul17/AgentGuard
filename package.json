@@ -1,0 +1,36 @@
+{
+  "name": "agent-guard",
+  "version": "1.0.0",
+  "description": "Stop AI agents from burning money - Real-time cost monitoring and auto-kill for LLM API calls",
+  "main": "agent-guard.js",
+  "keywords": [
+    "ai",
+    "agent",
+    "cost",
+    "openai",
+    "anthropic",
+    "claude",
+    "llm",
+    "monitoring",
+    "cost-control"
+  ],
+  "author": "AgentGuard Team",
+  "license": "MIT",
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/dipampaul17/AgentGuard.git"
+  },
+  "bugs": {
+    "url": "https://github.com/dipampaul17/AgentGuard/issues"
+  },
+  "homepage": "https://github.com/dipampaul17/AgentGuard",
+  "engines": {
+    "node": ">=12.0.0"
+  },
+  "files": [
+    "agent-guard.js",
+    "README.md",
+    "QUICKSTART.md",
+    "examples/"
+  ]
+}
