@@ -8,7 +8,7 @@
  */
 
 // Initialize AgentGuard with LOW limit for dramatic demo
-const agentGuard = require('./agent-guard');
+const agentGuard = require('../agent-guard');
 const guard = agentGuard.init({ 
   limit: 3.0,  // Low limit to trigger kill switch quickly
   webhook: null,

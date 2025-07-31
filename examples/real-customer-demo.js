@@ -30,7 +30,7 @@ class CustomerAgent {
     
     if (hasProtection) {
       // THE ONLY LINE CUSTOMERS ADD:
-      const agentGuard = require('./agent-guard');
+      const agentGuard = require('../agent-guard');
       this.guard = agentGuard.init({ limit: 1.5 });
       console.log(`${styles.success}🛡️  AgentGuard protection enabled${styles.reset}`);
     } else {

@@ -6,7 +6,7 @@
  */
 
 // Initialize AgentGuard FIRST - before any other imports
-const agentGuard = require('./agent-guard');
+const agentGuard = require('../agent-guard');
 const guard = agentGuard.init({ 
   limit: 25,  // $25 limit for production agent
   webhook: process.env.SLACK_WEBHOOK_URL // Optional: get notified when stopped
