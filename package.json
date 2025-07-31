@@ -1,18 +1,23 @@
 {
   "name": "agent-guard",
-  "version": "1.1.2",
-  "description": "Stop AI agents from burning money - Real-time cost monitoring and auto-kill for LLM API calls",
+  "version": "1.2.0",
+  "description": "Autonomous AI cost protection that actually works. Real-time budget enforcement with auto-kill prevents runaway LLM costs before they happen. Unlike monitoring tools, AgentGuard stops the bleeding.",
   "main": "agent-guard.js",
   "keywords": [
     "ai",
     "agent",
-    "cost",
+    "cost-control",
     "openai",
     "anthropic",
     "claude",
     "llm",
+    "budget",
+    "auto-kill",
+    "protection",
     "monitoring",
-    "cost-control"
+    "prevention",
+    "runaway-costs",
+    "real-time"
   ],
   "author": "AgentGuard Team",
   "license": "MIT",

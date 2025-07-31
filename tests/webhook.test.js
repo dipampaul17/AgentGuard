@@ -1,7 +1,8 @@
-const { init } = require('../agent-guard.js');
+// Mock fetch before requiring the module
+const mockFetch = jest.fn().mockResolvedValue({ ok: true });
+global.fetch = mockFetch;
 
-// Mock fetch globally
-global.fetch = jest.fn();
+const { init } = require('../agent-guard.js');
 
 describe('AgentGuard Webhook Integration', () => {
   let originalConsoleLog;
@@ -13,9 +14,9 @@ describe('AgentGuard Webhook Integration', () => {
     console.log = (...args) => logOutput.push(args.join(' '));
     
     // Reset mocks
-    jest.clearAllMocks();
+    mockFetch.mockClear();
+    mockFetch.mockResolvedValue({ ok: true });
     logOutput = [];
-    global.fetch.mockResolvedValue({ ok: true });
   });
 
   afterEach(() => {
@@ -45,7 +46,7 @@ describe('AgentGuard Webhook Integration', () => {
       await new Promise(resolve => setTimeout(resolve, 100));
       
       // Check webhook was called
-      expect(global.fetch).toHaveBeenCalledWith(
+      expect(mockFetch).toHaveBeenCalledWith(
         webhookUrl,
         expect.objectContaining({
           method: 'POST',
@@ -55,7 +56,7 @@ describe('AgentGuard Webhook Integration', () => {
       );
       
       // Parse the body to check structure
-      const callArgs = global.fetch.mock.calls[0];
+      const callArgs = mockFetch.mock.calls[0];
       const body = JSON.parse(callArgs[1].body);
       expect(body).toMatchObject({
         text: expect.stringContaining('AGENTGUARD'),
@@ -68,7 +69,7 @@ describe('AgentGuard Webhook Integration', () => {
     });
 
     test('should handle webhook failure gracefully', async () => {
-      global.fetch.mockRejectedValueOnce(new Error('Network error'));
+      mockFetch.mockRejectedValueOnce(new Error('Network error'));
       
       const webhookUrl = 'https://hooks.slack.com/test-webhook';
       const mockExit = jest.spyOn(process, 'exit').mockImplementation(() => {});
@@ -120,7 +121,7 @@ describe('AgentGuard Webhook Integration', () => {
       }
       
       // Check webhook was called
-      const callArgs = global.fetch.mock.calls[0];
+      const callArgs = mockFetch.mock.calls[0];
       const body = JSON.parse(callArgs[1].body);
       expect(body.text).toContain('Saved you ~$');
       
@@ -150,7 +151,7 @@ describe('AgentGuard Webhook Integration', () => {
       await new Promise(resolve => setTimeout(resolve, 100));
       
       // Webhook should be called with standard format
-      expect(global.fetch).toHaveBeenCalledWith(webhookUrl, expect.any(Object));
+      expect(mockFetch).toHaveBeenCalledWith(webhookUrl, expect.any(Object));
       
       mockExit.mockRestore();
     });
@@ -176,7 +177,7 @@ describe('AgentGuard Webhook Integration', () => {
       await new Promise(resolve => setTimeout(resolve, 100));
       
       // Check webhook payload
-      const callArgs = global.fetch.mock.calls[0];
+      const callArgs = mockFetch.mock.calls[0];
       const body = JSON.parse(callArgs[1].body);
       
       expect(body).toHaveProperty('text');

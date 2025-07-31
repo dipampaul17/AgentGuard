@@ -43,8 +43,9 @@
     webhook: null,
     enabled: true,
     silent: false,
-    mode: 'kill', // 'kill', 'throw', 'notify'
-    redis: null // Redis URL for multi-process budget tracking
+    mode: 'throw', // 'throw', 'notify', 'kill' - throw is safer default
+    redis: null, // Redis URL for multi-process budget tracking
+    privacy: false // If true, don't log request/response bodies
   };
 
   let totalCost = 0;
@@ -124,6 +125,41 @@
     return Math.ceil((words * 1.3) + (chars * 0.25));
   }
 
+  function parsePythonCosts(pythonCode) {
+    const prices = {};
+    try {
+      // Extract model pricing from Python code
+      const lines = pythonCode.split('\n');
+      let insideModels = false;
+      
+      for (const line of lines) {
+        if (line.includes('PRICING = {') || line.includes('model_prices = {')) {
+          insideModels = true;
+          continue;
+        }
+        
+        if (insideModels && line.includes('}')) {
+          break;
+        }
+        
+        if (insideModels) {
+          // Parse lines like: "gpt-4": {"input": 0.03, "output": 0.06},
+          const match = line.match(/"([^"]+)":\s*\{\s*"input":\s*([\d.]+),\s*"output":\s*([\d.]+)/);
+          if (match) {
+            const [, model, input, output] = match;
+            prices[model] = {
+              input: parseFloat(input),
+              output: parseFloat(output)
+            };
+          }
+        }
+      }
+    } catch (e) {
+      console.warn('AgentGuard: Failed to parse Python costs:', e.message);
+    }
+    return prices;
+  }
+
   async function updatePrices() {
     if (!original.fetch) return; // Can't fetch prices without fetch
     
@@ -138,23 +174,77 @@
         }
       }
       
-      // Fetch latest prices from OpenAI and Anthropic (mock implementation)
-      // In production, this would fetch from official pricing APIs
-      const updatedPrices = {
-        // These would be fetched from live APIs in production
-        timestamp: Date.now(),
-        prices: {
-          'gpt-4': { input: 0.03, output: 0.06 },
-          'gpt-4-turbo': { input: 0.01, output: 0.03 },
-          'gpt-3.5-turbo': { input: 0.0015, output: 0.002 },
-          'gpt-4o': { input: 0.0025, output: 0.01 },
-          'gpt-4o-mini': { input: 0.00015, output: 0.0006 },
-          'claude-3-opus': { input: 0.015, output: 0.075 },
-          'claude-3-sonnet': { input: 0.003, output: 0.015 },
-          'claude-3-haiku': { input: 0.00025, output: 0.00125 },
-          'claude-3-5-sonnet': { input: 0.003, output: 0.015 }
+      // Fetch latest prices from multiple sources
+      const updatedPrices = { timestamp: Date.now(), prices: {} };
+      
+      // Fetch from real community-maintained pricing sources
+      let fetchedPrices = false;
+      
+      try {
+        // Real tokencost pricing from GitHub
+        const response = await original.fetch('https://raw.githubusercontent.com/AgentOps-AI/tokencost/main/tokencost/costs.py', { 
+          timeout: 10000,
+          headers: { 'User-Agent': 'AgentGuard/1.2.0' }
+        });
+        
+        if (response.ok) {
+          const costsText = await response.text();
+          // Parse the Python costs.py file for pricing data
+          const modelPrices = parsePythonCosts(costsText);
+          if (Object.keys(modelPrices).length > 0) {
+            updatedPrices.prices = { ...updatedPrices.prices, ...modelPrices };
+            fetchedPrices = true;
+          }
         }
+      } catch (e) {
+        console.warn('AgentGuard: Failed to fetch tokencost pricing:', e.message);
+      }
+      
+      // Fallback: Try to fetch OpenAI and Anthropic pricing from documentation scraping
+      if (!fetchedPrices) {
+        try {
+          // Real pricing from a maintained community API
+          const response = await original.fetch('https://api.github.com/repos/AgentOps-AI/tokencost/contents/tokencost/model_prices.json', {
+            timeout: 10000,
+            headers: { 'User-Agent': 'AgentGuard/1.2.0' }
+          });
+          
+          if (response.ok) {
+            const data = await response.json();
+            const priceData = JSON.parse(Buffer.from(data.content, 'base64').toString());
+            
+            // Convert tokencost format to our format
+            Object.entries(priceData).forEach(([model, pricing]) => {
+              if (pricing.prompt_cost_per_1k && pricing.completion_cost_per_1k) {
+                updatedPrices.prices[model] = {
+                  input: pricing.prompt_cost_per_1k,
+                  output: pricing.completion_cost_per_1k
+                };
+              }
+            });
+            fetchedPrices = true;
+          }
+        } catch (e) {
+          console.warn('AgentGuard: Failed to fetch GitHub pricing data:', e.message);
+        }
+      }
+      
+      // Fallback to manual updates of known recent prices (January 2025)
+      const fallbackPrices = {
+        'gpt-4': { input: 0.03, output: 0.06 },
+        'gpt-4-turbo': { input: 0.01, output: 0.03 },
+        'gpt-3.5-turbo': { input: 0.0015, output: 0.002 },
+        'gpt-4o': { input: 0.0025, output: 0.01 },
+        'gpt-4o-mini': { input: 0.00015, output: 0.0006 },
+        'claude-3-opus': { input: 0.015, output: 0.075 },
+        'claude-3-sonnet': { input: 0.003, output: 0.015 },
+        'claude-3-haiku': { input: 0.00025, output: 0.00125 },
+        'claude-3-5-sonnet': { input: 0.003, output: 0.015 },
+        'claude-3-5-haiku': { input: 0.001, output: 0.005 }
       };
+      
+      // Merge fetched prices with fallback
+      updatedPrices.prices = { ...fallbackPrices, ...updatedPrices.prices };
       
       // Update in-memory prices
       API_COSTS = { ...API_COSTS, ...updatedPrices.prices };
@@ -163,6 +253,8 @@
       if (fs && fs.writeFileSync) {
         fs.writeFileSync(PRICE_CACHE_FILE, JSON.stringify(updatedPrices, null, 2));
       }
+      
+      console.log(`AgentGuard: Updated pricing for ${Object.keys(updatedPrices.prices).length} models`);
     } catch (e) {
       console.warn('AgentGuard: Failed to update prices, using cached values:', e.message);
     }
@@ -190,6 +282,9 @@
         return newTotal;
       } catch (e) {
         console.warn('AgentGuard: Redis increment failed, using local tracking:', e.message);
+        // Fall back to local tracking on Redis error
+        totalCost += cost;
+        return totalCost;
       }
     }
     totalCost += cost;
@@ -198,6 +293,7 @@
 
   function extractTokensFromResponse(response, model) {
     try {
+      // Prefer official usage data when available
       if (response.usage) {
         return {
           input: response.usage.prompt_tokens || response.usage.input_tokens || 0,
@@ -205,17 +301,73 @@
         };
       }
       
-      // Fallback: estimate from content
-      const content = response.choices?.[0]?.message?.content || 
-                     response.content?.[0]?.text || 
-                     JSON.stringify(response);
+      // Handle streaming responses (partial data)
+      if (response.choices && response.choices.length > 0) {
+        const choice = response.choices[0];
+        if (choice.delta) {
+          // Streaming delta - accumulate tokens
+          const deltaContent = choice.delta.content || '';
+          return {
+            input: 0, // Input tokens only counted once at start of stream
+            output: estimateTokens(deltaContent, model)
+          };
+        }
+      }
       
+      // Handle Anthropic response format
+      if (response.content && Array.isArray(response.content)) {
+        const totalText = response.content
+          .filter(item => item.type === 'text')
+          .map(item => item.text)
+          .join('');
+        return {
+          input: 0, // Anthropic doesn't provide input tokens in responses
+          output: estimateTokens(totalText, model)
+        };
+      }
+      
+      // Handle multimodal content (images, audio)
+      if (response.choices?.[0]?.message) {
+        const message = response.choices[0].message;
+        let totalTokens = 0;
+        
+        if (typeof message.content === 'string') {
+          totalTokens = estimateTokens(message.content, model);
+        } else if (Array.isArray(message.content)) {
+          // Multimodal content
+          message.content.forEach(item => {
+            if (item.type === 'text') {
+              totalTokens += estimateTokens(item.text, model);
+            } else if (item.type === 'image_url') {
+              // OpenAI image token estimation
+              totalTokens += 85; // Base tokens for image
+              // Add resolution-based tokens if available
+            } else if (item.type === 'audio') {
+              // Estimate audio tokens (rough approximation)
+              totalTokens += 100;
+            }
+          });
+        }
+        
+        return {
+          input: Math.round(totalTokens * 0.2), // Estimate input portion
+          output: Math.round(totalTokens * 0.8)
+        };
+      }
+      
+      // Generic fallback for unknown formats
+      const content = response.text || 
+                     response.content || 
+                     JSON.stringify(response).slice(0, 1000); // Limit stringified content
+      
+      const estimatedTokens = estimateTokens(content, model);
       return {
-        input: estimateTokens(content, model) * 0.3, // Rough input estimate
-        output: estimateTokens(content, model)
+        input: Math.round(estimatedTokens * 0.3),
+        output: Math.round(estimatedTokens * 0.7)
       };
     } catch (e) {
-      return { input: 100, output: 100 }; // Conservative fallback
+      console.warn('AgentGuard: Token extraction failed:', e.message);
+      return { input: 50, output: 50 }; // Conservative fallback
     }
   }
 
@@ -331,22 +483,34 @@
     const estimatedSavings = Math.max(0, (config.limit * 5) - totalCost);
     const message = `AGENTGUARD: ${reason} - Saved you ~$${estimatedSavings.toFixed(2)}`;
     
-    original.log(`\n${colors.red}${colors.bold}${message}${colors.reset}`);
-    original.log(`${colors.cyan}Total cost when stopped: $${totalCost.toFixed(4)}${colors.reset}`);
-    original.log(`${colors.yellow}Budget used: ${((totalCost / config.limit) * 100).toFixed(1)}%${colors.reset}`);
+    original.log(`\n${colors.red}${colors.bold}🛑 ${message}${colors.reset}`);
+    original.log(`${colors.cyan}💰 Total cost when stopped: $${totalCost.toFixed(4)}${colors.reset}`);
+    original.log(`${colors.yellow}📊 Budget used: ${((totalCost / config.limit) * 100).toFixed(1)}%${colors.reset}`);
     
     sendWebhook(message);
 
-    // Handle different modes
+    // Handle different modes with improved messaging
     if (config.mode === 'notify') {
-      original.log(`${colors.yellow}Mode: notify - continuing execution with warning${colors.reset}`);
+      original.log(`${colors.yellow}⚠️  Mode: notify - continuing execution with cost monitoring${colors.reset}`);
+      original.log(`${colors.cyan}💡 Tip: Set mode to 'throw' for safer error handling${colors.reset}`);
       return;
     } else if (config.mode === 'throw') {
-      throw new Error('AGENTGUARD_LIMIT_EXCEEDED: ' + message);
+      original.log(`${colors.green}🛡️  Mode: throw - gracefully stopping with recoverable error${colors.reset}`);
+      const error = new Error(`AGENTGUARD_LIMIT_EXCEEDED: ${message}`);
+      error.agentGuardData = {
+        totalCost,
+        limit: config.limit,
+        percentUsed: (totalCost / config.limit) * 100,
+        estimatedSavings,
+        timestamp: Date.now()
+      };
+      throw error;
     } else if (config.mode === 'kill') {
+      original.log(`${colors.red}💀 Mode: kill - terminating process immediately${colors.reset}`);
+      original.log(`${colors.cyan}💡 Tip: Consider using mode 'throw' for graceful shutdown${colors.reset}`);
       // Kill immediately - no delay for runaway loops
       if (original.exit) {
-        original.exit(1);
+        setTimeout(() => original.exit(1), 100); // Small delay for logs to flush
       } else if (typeof window !== 'undefined') {
         alert(`${message}\nReloading page...`);
         window.location.reload();
@@ -358,7 +522,7 @@
 
   function interceptConsole() {
     console.log = function(...args) {
-      // Look for API response patterns in logs
+      // Look for API response patterns in logs (privacy-aware)
       args.forEach(arg => {
         if (typeof arg === 'object' && arg !== null) {
           if (arg.choices || arg.content || arg.usage) {
@@ -371,7 +535,9 @@
                 timestamp: Date.now(),
                 model,
                 cost,
-                tokens
+                tokens,
+                source: 'console',
+                content: config.privacy ? '[REDACTED]' : (arg.choices?.[0]?.message?.content || arg.content || '[no content]')
               });
 
               updateDisplay();
@@ -387,7 +553,18 @@
         }
       });
 
-      original.log.apply(console, args);
+      // Optionally filter sensitive data from console output
+      if (config.privacy) {
+        const filteredArgs = args.map(arg => {
+          if (typeof arg === 'object' && arg !== null && (arg.choices || arg.content)) {
+            return { ...arg, choices: '[REDACTED]', content: '[REDACTED]' };
+          }
+          return arg;
+        });
+        original.log.apply(console, filteredArgs);
+      } else {
+        original.log.apply(console, args);
+      }
     };
   }
 
@@ -426,6 +603,101 @@
       }
     } catch (e) {
       // axios not available, skip
+    }
+    
+    // Intercept undici (Node.js modern HTTP client)
+    try {
+      const undici = require('undici');
+      if (undici && undici.request) {
+        const originalRequest = undici.request;
+        undici.request = function(url, options = {}) {
+          const result = originalRequest.call(this, url, options);
+          if (typeof url === 'string' && (url.includes('openai.com') || url.includes('anthropic.com'))) {
+            result.then(response => {
+              response.body.json().then(data => {
+                handleAxiosResponse(url, data);
+              }).catch(() => {});
+            }).catch(() => {});
+          }
+          return result;
+        };
+      }
+    } catch (e) {
+      // undici not available, skip
+    }
+    
+    // Intercept got (popular HTTP library)
+    try {
+      const Module = require('module');
+      const originalRequire = Module.prototype.require;
+      Module.prototype.require = function(id) {
+        const result = originalRequire.apply(this, arguments);
+        if (id === 'got' && result && typeof result === 'function') {
+          const originalGot = result;
+          return function(...args) {
+            const instance = originalGot(...args);
+            if (instance && instance.then) {
+              // Handle promise-like got requests
+              const url = args[0];
+              if (typeof url === 'string' && (url.includes('openai.com') || url.includes('anthropic.com'))) {
+                instance.then(response => {
+                  let data = response.body;
+                  if (typeof data === 'string') {
+                    try {
+                      data = JSON.parse(data);
+                    } catch (e) {}
+                  }
+                  handleAxiosResponse(url, data);
+                }).catch(() => {});
+              }
+            }
+            return instance;
+          };
+        }
+        return result;
+      };
+    } catch (e) {
+      // got interception failed, skip
+    }
+    
+    // Intercept HTTP/HTTPS modules for broader coverage
+    try {
+      const http = require('http');
+      const https = require('https');
+      
+      [http, https].forEach(module => {
+        if (module && module.request) {
+          const originalRequest = module.request;
+          module.request = function(options, callback) {
+            const isAIAPI = (options.hostname && 
+              (options.hostname.includes('openai.com') || options.hostname.includes('anthropic.com'))) ||
+              (typeof options === 'string' && 
+              (options.includes('openai.com') || options.includes('anthropic.com')));
+            
+            if (isAIAPI) {
+              const req = originalRequest.call(this, options, (res) => {
+                let data = '';
+                res.on('data', chunk => data += chunk);
+                res.on('end', () => {
+                  try {
+                    const jsonData = JSON.parse(data);
+                    const url = typeof options === 'string' ? options : `${options.protocol || 'https:'}//${options.hostname}${options.path || ''}`;
+                    handleAxiosResponse(url, jsonData);
+                  } catch (e) {
+                    // Not JSON or parsing failed
+                  }
+                });
+                if (callback) callback(res);
+              });
+              return req;
+            }
+            
+            return originalRequest.call(this, options, callback);
+          };
+        }
+      });
+    } catch (e) {
+      // HTTP interception failed, skip
     }
   }
 
@@ -508,7 +780,7 @@
     // Update prices from live APIs
     await updatePrices();
 
-    const initMessage = `${colors.green}${colors.bold}AgentGuard${colors.reset} ${colors.cyan}v1.1.0${colors.reset} ${colors.green}initialized${colors.reset}`;
+    const initMessage = `${colors.green}${colors.bold}AgentGuard${colors.reset} ${colors.cyan}v1.2.0${colors.reset} ${colors.green}initialized${colors.reset}`;
     const limitMessage = `${colors.cyan}Budget protection: $${config.limit} (mode: ${config.mode})${colors.reset}`;
     const divider = (colors.dim || '') + '-'.repeat(50) + (colors.reset || '');
     
@@ -532,7 +804,12 @@
       getLimit: () => config.limit,
       setLimit: (newLimit) => { config.limit = newLimit; },
       setMode: (newMode) => { config.mode = newMode; },
-      disable: () => { config.enabled = false; },
+      disable: () => { 
+        config.enabled = false; 
+        // Reset costs when disabled to prevent state contamination
+        totalCost = 0;
+        apiCallsLog.length = 0;
+      },
       getLogs: () => [...apiCallsLog],
       updatePrices,
       reset: async () => { 

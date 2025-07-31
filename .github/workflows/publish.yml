@@ -65,20 +65,20 @@ jobs:
         
         # Upload to release
         gh release upload ${{ github.event.release.tag_name }} \
-          agent-guard-${{ env.VERSION }}.tgz \
+          agent-guard-${VERSION}.tgz \
           dist/agent-guard.min.js \
-          dist/agent-guard-${{ env.VERSION }}.min.js \
+          dist/agent-guard-${VERSION}.min.js \
           --clobber
       env:
         GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
     
     - name: Update CDN Documentation
       run: |
-        echo "✅ Published version ${{ env.VERSION }} to NPM"
+        echo "✅ Published version ${VERSION} to NPM"
         echo ""
         echo "📦 Installation:"
-        echo "  npm install agent-guard@${{ env.VERSION }}"
+        echo "  npm install agent-guard@${VERSION}"
         echo ""
         echo "🌐 CDN URLs:"
-        echo "  https://unpkg.com/agent-guard@${{ env.VERSION }}/dist/agent-guard.min.js"
-        echo "  https://cdn.jsdelivr.net/npm/agent-guard@${{ env.VERSION }}/dist/agent-guard.min.js"
+        echo "  https://unpkg.com/agent-guard@${VERSION}/dist/agent-guard.min.js"
+        echo "  https://cdn.jsdelivr.net/npm/agent-guard@${VERSION}/dist/agent-guard.min.js"

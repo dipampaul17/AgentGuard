@@ -109,6 +109,7 @@ describe('AgentGuard Redis Integration', () => {
         silent: true 
       });
       
+      // Should return null when Redis is working
       expect(guard.getCost()).toBeNull();
     });
 
