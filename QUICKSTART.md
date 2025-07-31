@@ -4,12 +4,17 @@ Get protection in 30 seconds.
 
 ## 1. Install
 ```bash
-npm install agent-guard
+# Download AgentGuard directly
+curl -O https://raw.githubusercontent.com/dipampaul17/AgentGuard/main/agent-guard.js
+
+# Or clone the full repo
+git clone https://github.com/dipampaul17/AgentGuard.git
 ```
 
 ## 2. Add ONE line to your agent
 ```javascript
-require('agent-guard').init({ limit: 10 });
+const agentGuard = require('./agent-guard');
+agentGuard.init({ limit: 10 });
 
 // Your existing agent code...
 // AgentGuard now protects everything below
