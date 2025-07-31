@@ -200,8 +200,8 @@
     try {
       if (response.usage) {
         return {
-          input: response.usage.prompt_tokens || 0,
-          output: response.usage.completion_tokens || 0
+          input: response.usage.prompt_tokens || response.usage.input_tokens || 0,
+          output: response.usage.completion_tokens || response.usage.output_tokens || 0
         };
       }
       

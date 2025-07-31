@@ -88,9 +88,12 @@ describe('AgentGuard', () => {
   describe('Cost Calculation', () => {
     test('should calculate OpenAI GPT-3.5-turbo costs correctly', async () => {
       const guard = await init({ limit: 10, silent: true });
+      await guard.reset();
       
       // Simulate OpenAI response logging
       console.log(openAIFixture);
+      await waitForAsync();
+      await new Promise(resolve => setTimeout(resolve, 200)); // Consistent wait time for CI
       
       // Cost should be: (13 * 0.0015 + 10 * 0.002) / 1000 = 0.0000395
       expect(guard.getCost()).toBeCloseTo(0.0000395, 6);
@@ -103,7 +106,7 @@ describe('AgentGuard', () => {
       // Simulate Anthropic response logging
       console.log(anthropicFixture);
       await waitForAsync(); // Wait for async cost calculation
-      await new Promise(resolve => setTimeout(resolve, 50)); // Extra wait for async processing
+      await new Promise(resolve => setTimeout(resolve, 200)); // Longer wait time for CI
       
       // Cost should be: (12 * 0.00025 + 8 * 0.00125) / 1000 = 0.000013
       expect(guard.getCost()).toBeCloseTo(0.000013, 6);
@@ -152,11 +155,13 @@ describe('AgentGuard', () => {
       await guard.reset();
       
       console.log(openAIFixture);
-      await new Promise(resolve => setTimeout(resolve, 50));
+      await waitForAsync();
+      await new Promise(resolve => setTimeout(resolve, 200)); // Longer wait time for CI
       const cost1 = guard.getCost();
       
       console.log(anthropicFixture);
-      await new Promise(resolve => setTimeout(resolve, 50));
+      await waitForAsync();
+      await new Promise(resolve => setTimeout(resolve, 200)); // Longer wait time for CI
       const cost2 = guard.getCost();
       
       expect(cost2).toBeGreaterThan(cost1);
