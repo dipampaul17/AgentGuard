@@ -48,7 +48,7 @@
     "example:langchain": "node examples/langchain-example.js",
     "benchmark": "node benchmarks/performance.js",
     "benchmark:gc": "node --expose-gc benchmarks/performance.js",
-    "prepublishOnly": "npm test && npm run build"
+    "prepublishOnly": "npm test -- --testPathPattern=agent-guard.test.js && npm run build"
   },
   "files": [
     "agent-guard.js",

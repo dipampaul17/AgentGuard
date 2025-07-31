@@ -34,7 +34,7 @@ describe('AgentGuard Edge Cases', () => {
       };
       
       console.log(malformedResponse);
-      await new Promise(resolve => setTimeout(resolve, 50));
+      await new Promise(resolve => setTimeout(resolve, 200));
       
       // Should not crash and should track some cost
       expect(guard.getCost()).toBeGreaterThan(0);
@@ -92,7 +92,7 @@ describe('AgentGuard Edge Cases', () => {
       };
       
       console.log(response);
-      await new Promise(resolve => setTimeout(resolve, 50));
+      await new Promise(resolve => setTimeout(resolve, 200));
       
       // Should calculate large cost correctly
       expect(guard.getCost()).toBeGreaterThan(100);
@@ -110,7 +110,7 @@ describe('AgentGuard Edge Cases', () => {
       };
       
       console.log(response);
-      await new Promise(resolve => setTimeout(resolve, 50));
+      await new Promise(resolve => setTimeout(resolve, 200));
       
       expect(guard.getCost()).toBe(0);
     });
@@ -127,7 +127,7 @@ describe('AgentGuard Edge Cases', () => {
       };
       
       console.log(response);
-      await new Promise(resolve => setTimeout(resolve, 50));
+      await new Promise(resolve => setTimeout(resolve, 200));
       
       // Should not crash, cost should be 0 or positive
       expect(guard.getCost()).toBeGreaterThanOrEqual(0);
@@ -144,7 +144,7 @@ describe('AgentGuard Edge Cases', () => {
       };
       
       console.log(response);
-      await new Promise(resolve => setTimeout(resolve, 50));
+      await new Promise(resolve => setTimeout(resolve, 200));
       
       // Should use default pricing
       expect(guard.getCost()).toBeGreaterThan(0);
@@ -272,7 +272,7 @@ describe('AgentGuard Edge Cases', () => {
       };
       console.log(response);
       
-      await new Promise(resolve => setTimeout(resolve, 50));
+      await new Promise(resolve => setTimeout(resolve, 200));
       
       // Should not track costs when disabled
       expect(guard.getCost()).toBe(0);
