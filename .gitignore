@@ -45,3 +45,6 @@ coverage/
 # Cache files
 .agentguard-cache.json
 *.cache
+
+# IDE & Editor (additional)
+.cursor/
