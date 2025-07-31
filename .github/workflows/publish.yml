@@ -1,0 +1,84 @@
+name: Publish to NPM
+
+on:
+  release:
+    types: [published]
+  workflow_dispatch:
+    inputs:
+      version:
+        description: 'Version to publish (e.g., 1.2.0)'
+        required: true
+        type: string
+
+jobs:
+  publish:
+    runs-on: ubuntu-latest
+    
+    steps:
+    - uses: actions/checkout@v4
+    
+    - name: Setup Node.js
+      uses: actions/setup-node@v3
+      with:
+        node-version: '18.x'
+        registry-url: 'https://registry.npmjs.org'
+        cache: 'npm'
+    
+    - name: Install dependencies
+      run: npm ci
+    
+    - name: Run tests
+      run: npm test
+    
+    - name: Build distribution files
+      run: npm run build
+    
+    - name: Update version (manual trigger)
+      if: github.event_name == 'workflow_dispatch'
+      run: |
+        npm version ${{ github.event.inputs.version }} --no-git-tag-version
+        echo "VERSION=${{ github.event.inputs.version }}" >> $GITHUB_ENV
+    
+    - name: Extract version (release trigger)
+      if: github.event_name == 'release'
+      run: |
+        VERSION=${GITHUB_REF#refs/tags/v}
+        echo "VERSION=$VERSION" >> $GITHUB_ENV
+        npm version $VERSION --no-git-tag-version
+    
+    - name: Verify package
+      run: |
+        npm pack --dry-run
+        echo "📦 Package contents:"
+        npm pack --dry-run 2>&1 | grep -E "^npm notice"
+    
+    - name: Publish to NPM
+      run: npm publish
+      env:
+        NODE_AUTH_TOKEN: ${{ secrets.NPM_TOKEN }}
+    
+    - name: Create GitHub Release Assets
+      if: github.event_name == 'release'
+      run: |
+        # Create tarball
+        npm pack
+        
+        # Upload to release
+        gh release upload ${{ github.event.release.tag_name }} \
+          agent-guard-${{ env.VERSION }}.tgz \
+          dist/agent-guard.min.js \
+          dist/agent-guard-${{ env.VERSION }}.min.js \
+          --clobber
+      env:
+        GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+    
+    - name: Update CDN Documentation
+      run: |
+        echo "✅ Published version ${{ env.VERSION }} to NPM"
+        echo ""
+        echo "📦 Installation:"
+        echo "  npm install agent-guard@${{ env.VERSION }}"
+        echo ""
+        echo "🌐 CDN URLs:"
+        echo "  https://unpkg.com/agent-guard@${{ env.VERSION }}/dist/agent-guard.min.js"
+        echo "  https://cdn.jsdelivr.net/npm/agent-guard@${{ env.VERSION }}/dist/agent-guard.min.js"

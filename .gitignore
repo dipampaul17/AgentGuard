@@ -35,7 +35,14 @@ test-*.js
 test-npm-package.js
 
 # Build artifacts
-dist/
 build/
 *.tgz
 *.tar.gz
+
+# Testing & Coverage
+coverage/
+.nyc_output/
+
+# Cache files
+.agentguard-cache.json
+*.cache

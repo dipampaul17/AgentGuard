@@ -11,10 +11,10 @@ npm install agent-guard
 curl -O https://raw.githubusercontent.com/dipampaul17/AgentGuard/main/agent-guard.js
 ```
 
-## 2. Add ONE line to your agent
+## 2. Add to your agent
 ```javascript
 const agentGuard = require('agent-guard');
-agentGuard.init({ limit: 10 });
+await agentGuard.init({ limit: 10 });
 
 // Your existing agent code...
 // AgentGuard now protects everything below
@@ -28,7 +28,7 @@ Watch the cost counter: `💸 $0.12... $0.45... $0.89...`
 
 ## 4. Configure for your needs
 ```javascript
-const guard = require('agent-guard').init({
+const guard = await require('agent-guard').init({
   limit: 50,                                    // Kill at $50
   webhook: 'https://hooks.slack.com/...',      // Slack alerts
   silent: false                                // Show cost updates
@@ -50,7 +50,7 @@ console.log(`Current: $${guard.getCost()}`);
 ## Real Example: RAG Agent Protection
 ```javascript
 // Add at the top of your RAG agent
-require('agent-guard').init({ limit: 100 });
+await require('agent-guard').init({ limit: 100 });
 
 // Your existing code
 async function processDocument(doc) {
@@ -106,8 +106,8 @@ async function processDocument(doc) {
 
 ## Next Steps
 
-- 📊 [Get Pro Dashboard](https://agentguard.dev/pricing) - Analytics & team features
-- 💬 [Join Slack](https://agentguard.slack.com) - Community support  
-- 🚨 [Emergency Help](mailto:emergency@agentguard.dev) - 24/7 installation help
+- 📧 [GitHub Issues](https://github.com/dipampaul17/AgentGuard/issues) - Report bugs or request features
+- 💬 [GitHub Discussions](https://github.com/dipampaul17/AgentGuard/discussions) - Community support
+- 📖 [Full Documentation](API.md) - Complete API reference
 
 **Stop losing money. Start shipping safely.** 🛡️

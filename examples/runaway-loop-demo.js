@@ -16,11 +16,7 @@
 // Initialize AgentGuard with low limit for quick demonstration
 // Use require('agent-guard') if you installed via NPM
 const agentGuard = require('../agent-guard');
-const guard = agentGuard.init({ 
-  limit: 3.0,  // Low limit to trigger kill switch quickly
-  webhook: null,
-  silent: false 
-});
+let guard; // Will be initialized asynchronously
 
 const styles = {
   danger: '\x1b[1m\x1b[31m',     // Bold red
@@ -42,7 +38,7 @@ function printHeader() {
   console.log(`\n${styles.warning}⚠️  SCENARIO: RAG agent with recursive document processing${styles.reset}`);
   console.log(`${styles.warning}💥 BUG: Logic error causes infinite self-referencing${styles.reset}`);
   console.log(`${styles.warning}🔥 RESULT: Without AgentGuard = $500+ overnight burn${styles.reset}`);
-  console.log(`${styles.info}🛡️  PROTECTION: AgentGuard kills at $${guard.getLimit()}${styles.reset}\n`);
+  console.log(`${styles.info}🛡️  PROTECTION: AgentGuard kills at $${guard ? guard.getLimit() : '3.0'}${styles.reset}\n`);
 }
 
 // Simulate the type of recursive processing that burns money
@@ -201,7 +197,7 @@ class RunawayRAGAgent {
       });
     }
     
-    if (wasSaved) {
+    if (wasSaved && guard) {
       const estimatedWithoutGuard = guard.getLimit() * 10; // Conservative estimate
       console.log(`\n${styles.success}💵 MONEY SAVED: ~$${estimatedWithoutGuard.toFixed(2)}${styles.reset}`);
       console.log(`${styles.success}⏰ TIME SAVED: Infinite (loop would run forever)${styles.reset}`);
@@ -212,23 +208,39 @@ class RunawayRAGAgent {
   }
 }
 
-// Start the protection example
-const agent = new RunawayRAGAgent();
-agent.startTime = Date.now();
-
-process.on('SIGINT', () => {
-  console.log('\n\n' + styles.warning + '⏹️  Example interrupted by user' + styles.reset);
-  agent.showStats(false);
-  process.exit(0);
-});
-
-console.log(styles.warning + '\n⚠️  WARNING: This example simulates a runaway loop that burns money' + styles.reset);
-console.log(styles.info + '🛡️  AgentGuard will kill it at $3 to demonstrate protection' + styles.reset);
-console.log(styles.dim + '⏱️  Starting in 3 seconds...\n' + styles.reset);
-
-setTimeout(() => {
-  agent.startRunawayLoop().catch(error => {
-    console.error(`\n${styles.danger}💥 Example failed: ${error.message}${styles.reset}`);
-    process.exit(1);
+// Main async function to handle initialization
+async function main() {
+  console.log(styles.warning + '\n⚠️  WARNING: This example simulates a runaway loop that burns money' + styles.reset);
+  console.log(styles.info + '🛡️  AgentGuard will kill it at $3 to demonstrate protection' + styles.reset);
+  console.log(styles.dim + '⏱️  Starting in 3 seconds...\n' + styles.reset);
+  
+  // Initialize AgentGuard
+  guard = await agentGuard.init({ 
+    limit: 3.0,  // Low limit to trigger kill switch quickly
+    webhook: null,
+    silent: false 
   });
-}, 3000);
+  
+  // Start the protection example
+  const agent = new RunawayRAGAgent();
+  agent.startTime = Date.now();
+  
+  process.on('SIGINT', () => {
+    console.log('\n\n' + styles.warning + '⏹️  Example interrupted by user' + styles.reset);
+    agent.showStats(false);
+    process.exit(0);
+  });
+  
+  setTimeout(() => {
+    agent.startRunawayLoop().catch(error => {
+      console.error(`\n${styles.danger}💥 Example failed: ${error.message}${styles.reset}`);
+      process.exit(1);
+    });
+  }, 3000);
+}
+
+// Run the main function
+main().catch(error => {
+  console.error(`\n${styles.danger}💥 Initialization failed: ${error.message}${styles.reset}`);
+  process.exit(1);
+});

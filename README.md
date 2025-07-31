@@ -33,14 +33,14 @@ const response = await openai.chat.completions.create({...});
 
 // After: Protected by AgentGuard
 const agentGuard = require('agent-guard');
-agentGuard.init({ limit: 50 });
+await agentGuard.init({ limit: 50 });
 const response = await openai.chat.completions.create({...});
 // 🛡️ AgentGuard now monitors every API call automatically
 ```
 
 ## 🎯 Key Features
 
-- **🔥 Zero Dependencies** - Single 11KB file
+- **🔥 Minimal Dependencies** - Lightweight ~18KB core file with optional tokenizers
 - **⚡ Zero Configuration** - Works out of the box
 - **🎨 Beautiful Terminal UI** - Real-time cost display with warnings
 - **🤖 Multi-Model Support** - OpenAI, Anthropic, Claude
@@ -59,7 +59,7 @@ npm install agent-guard
 
 **Option 2: Direct download**
 ```bash
-# Download just the core file (11KB)
+# Download just the core file (~18KB)
 curl -O https://raw.githubusercontent.com/dipampaul17/AgentGuard/main/agent-guard.js
 ```
 
@@ -71,9 +71,9 @@ cd AgentGuard
 
 ### Usage
 ```javascript
-// Add this ONE line at the start of your agent
+// Add this at the start of your agent
 const agentGuard = require('agent-guard');
-agentGuard.init({ limit: 25 }); // Kill at $25
+await agentGuard.init({ limit: 25 }); // Kill at $25
 
 // Your existing agent code continues unchanged
 const response = await openai.chat.completions.create({
@@ -87,7 +87,7 @@ console.log('Response:', response); // AgentGuard tracks this automatically
 ### What You'll See
 
 ```bash
-🛡️ AgentGuard v1.0.0 initialized
+🛡️ AgentGuard v1.1.0 initialized
 💰 Budget protection: $25
 💸 $0.23 / $25.00 0.9%    # Real-time cost tracking
 💸 $2.45 / $25.00 9.8%    # Updates with each API call
@@ -101,14 +101,14 @@ console.log('Response:', response); // AgentGuard tracks this automatically
 ### Basic Protection
 ```javascript
 const agentGuard = require('agent-guard');
-agentGuard.init({ limit: 10 });
+await agentGuard.init({ limit: 10 });
 // Process kills automatically at $10
 ```
 
 ### Advanced Configuration
 ```javascript
 const agentGuard = require('agent-guard');
-const guard = agentGuard.init({
+const guard = await agentGuard.init({
   limit: 100,                              // Kill at $100
   webhook: 'https://hooks.slack.com/...',  // Slack notifications
   silent: false                            // Show cost updates
@@ -174,7 +174,7 @@ Initializes AgentGuard with the specified options.
 
 ```javascript
 const agentGuard = require('agent-guard');
-const guard = agentGuard.init({
+const guard = await agentGuard.init({
   limit: 50,           // Cost limit in USD
   webhook: null,       // Webhook URL for notifications
   silent: false        // Hide cost updates

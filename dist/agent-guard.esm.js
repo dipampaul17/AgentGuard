@@ -3,7 +3,7 @@
  * Prevents runaway LLM costs with real-time monitoring and auto-kill
  */
 
-(function() {
+const AgentGuard = (() => {
   'use strict';
 
   // Tokenizer imports - wrapped in try/catch for environments without them
@@ -551,10 +551,9 @@
   }
 
   // Export for different environments
-  if (typeof module !== 'undefined' && module.exports) {
-    module.exports = { init, updatePrices };
-  } else if (typeof window !== 'undefined') {
-    window.AgentGuard = { init, updatePrices };
-  }
-
+  
+  return { init, updatePrices };
 })();
+
+export const { init, updatePrices } = AgentGuard;
+export default AgentGuard;

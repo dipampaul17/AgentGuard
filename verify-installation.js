@@ -17,20 +17,21 @@
 
 console.log('🔍 Verifying AgentGuard installation...\n');
 
-try {
-  // Step 1: Module loads
-  console.log('✅ Step 1: Loading AgentGuard module...');
-  // Use require('agent-guard') if you installed via NPM
-  const agentGuard = require('./agent-guard');
-  console.log('   ✅ Module loaded successfully');
+async function runVerification() {
+  try {
+    // Step 1: Module loads
+    console.log('✅ Step 1: Loading AgentGuard module...');
+    // Use require('agent-guard') if you installed via NPM
+    const agentGuard = require('./agent-guard');
+    console.log('   ✅ Module loaded successfully');
 
-  // Step 2: Initialization works
-  console.log('\n✅ Step 2: Initializing AgentGuard...');
-  const guard = agentGuard.init({ 
-    limit: 0.50,  // Low limit for quick verification
-    silent: false 
-  });
-  console.log('   ✅ Initialization successful');
+    // Step 2: Initialization works
+    console.log('\n✅ Step 2: Initializing AgentGuard...');
+    const guard = await agentGuard.init({ 
+      limit: 0.50,  // Low limit for quick verification
+      silent: false 
+    });
+    console.log('   ✅ Initialization successful');
 
   // Step 3: API methods available
   console.log('\n✅ Step 3: Checking API methods...');
@@ -102,18 +103,22 @@ try {
     console.log('   1. Add AgentGuard to your agent:');
     console.log('      NPM: const agentGuard = require("agent-guard")');
     console.log('      Local: const agentGuard = require("./agent-guard")');
-    console.log('   2. Initialize with your limit: agentGuard.init({ limit: 50 })');
+    console.log('   2. Initialize with your limit: await agentGuard.init({ limit: 50 })');
     console.log('   3. Run your agent normally - AgentGuard will protect it automatically');
 
     process.exit(0);
-  }, 1000);
+    }, 1000);
 
-} catch (error) {
-  console.log('\n❌ FAILED: AgentGuard installation verification failed');
-  console.log(`   Error: ${error.message}`);
-  console.log('\n🔧 Troubleshooting:');
-  console.log('   1. Make sure agent-guard.js is in the same directory');
-  console.log('   2. Download it with: curl -O https://raw.githubusercontent.com/dipampaul17/AgentGuard/main/agent-guard.js');
-  console.log('   3. Run this verification again: node verify-installation.js');
-  process.exit(1);
+  } catch (error) {
+    console.log('\n❌ FAILED: AgentGuard installation verification failed');
+    console.log(`   Error: ${error.message}`);
+    console.log('\n🔧 Troubleshooting:');
+    console.log('   1. Make sure agent-guard.js is in the same directory');
+    console.log('   2. Download it with: curl -O https://raw.githubusercontent.com/dipampaul17/AgentGuard/main/agent-guard.js');
+    console.log('   3. Run this verification again: node verify-installation.js');
+    process.exit(1);
+  }
 }
+
+// Run the verification
+runVerification();

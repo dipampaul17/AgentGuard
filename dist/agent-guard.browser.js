@@ -553,7 +553,8 @@
   // Export for different environments
   if (typeof module !== 'undefined' && module.exports) {
     module.exports = { init, updatePrices };
-  } else if (typeof window !== 'undefined') {
+  }
+  if (typeof window !== 'undefined') {
     window.AgentGuard = { init, updatePrices };
   }
 
