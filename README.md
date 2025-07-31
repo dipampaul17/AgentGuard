@@ -4,7 +4,8 @@
 
 **Stop AI agents from burning your money**
 
-[![npm version](https://badge.fury.io/js/agent-guard.svg)](https://badge.fury.io/js/agent-guard)
+[![npm version](https://img.shields.io/npm/v/agent-guard.svg)](https://npmjs.com/package/agent-guard)
+[![npm downloads](https://img.shields.io/npm/dm/agent-guard.svg)](https://npmjs.com/package/agent-guard)
 [![License: MIT](https://img.shields.io/badge/License-MIT-yellow.svg)](https://opensource.org/licenses/MIT)
 [![Node.js](https://img.shields.io/badge/node-%3E%3D12.0.0-brightgreen)](https://nodejs.org/)
 [![GitHub stars](https://img.shields.io/github/stars/dipampaul17/AgentGuard?style=social)](https://github.com/dipampaul17/AgentGuard)
