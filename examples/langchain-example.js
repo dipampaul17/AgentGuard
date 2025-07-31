@@ -13,12 +13,14 @@
 
 // Initialize AgentGuard FIRST
 const agentGuard = require('../agent-guard');
-const guard = agentGuard.init({ 
-  limit: 5,  // $5 limit for this demo
-  mode: 'throw' // Throw error instead of killing process for demo
-});
 
-console.log('🦜🔗 LangChain + AgentGuard Example\n');
+async function runLangChainExample() {
+  const guard = await agentGuard.init({ 
+    limit: 5,  // $5 limit for this demo
+    mode: 'throw' // Throw error instead of killing process for demo
+  });
+
+  console.log('🦜🔗 LangChain + AgentGuard Example\n');
 
 // Simulate LangChain imports (in real usage, you'd use actual LangChain)
 // const { ChatOpenAI } = require('langchain/chat_models/openai');
@@ -268,5 +270,9 @@ async function main() {
   }
 }
 
-// Run the examples
-main().catch(console.error);
+  // Main execution
+  await main();
+}
+
+// Run the example
+runLangChainExample().catch(console.error);

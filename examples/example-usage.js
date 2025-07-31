@@ -14,15 +14,17 @@
 // Initialize AgentGuard FIRST - before any other imports
 // Use require('agent-guard') if you installed via NPM
 const agentGuard = require('../agent-guard');
-const guard = agentGuard.init({ 
-  limit: 25,  // $25 limit for production agent
-  webhook: process.env.SLACK_WEBHOOK_URL // Optional: get notified when stopped
-});
 
-console.log('🤖 Starting AI Agent with AgentGuard protection...\n');
+async function initializeAgent() {
+  const guard = await agentGuard.init({ 
+    limit: 25,  // $25 limit for production agent
+    webhook: process.env.SLACK_WEBHOOK_URL // Optional: get notified when stopped
+  });
 
-// Simulate a real agent that makes multiple API calls
-class AIAgent {
+  console.log('🤖 Starting AI Agent with AgentGuard protection...\n');
+
+  // Simulate a real agent that makes multiple API calls
+  class AIAgent {
   constructor() {
     this.taskQueue = [];
     this.isRunning = false;
@@ -221,20 +223,30 @@ process.on('SIGINT', () => {
   process.exit(0);
 });
 
-// Show AgentGuard status periodically
-const statusInterval = setInterval(() => {
-  if (guard.getCost() > 0) {
-    process.stdout.write(`\r💸 Current cost: $${guard.getCost().toFixed(4)} / $${guard.getLimit()}    `);
-  }
-}, 2000);
+  // Show AgentGuard status periodically
+  const statusInterval = setInterval(() => {
+    if (guard && guard.getCost() > 0) {
+      process.stdout.write(`\r💸 Current cost: $${guard.getCost().toFixed(4)} / $${guard.getLimit()}  ${((guard.getCost() / guard.getLimit()) * 100).toFixed(1)}%              `);
+    }
+  }, 2000);
 
-// Clean up interval on exit
-process.on('exit', () => {
-  clearInterval(statusInterval);
-});
+  // Clean up interval on exit
+  process.on('exit', () => {
+    clearInterval(statusInterval);
+  });
 
-// Start the agent
-agent.run().catch(error => {
+  process.on('SIGINT', () => {
+    console.log('\n\n👋 Shutting down agent...');
+    clearInterval(statusInterval);
+    process.exit(0);
+  });
+
+  // Start the agent
+  return main();
+}
+
+// Initialize and run
+initializeAgent().catch(error => {
   console.error('\n💥 Agent crashed:', error.message);
   process.exit(1);
 });
