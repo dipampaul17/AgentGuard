@@ -3,9 +3,16 @@
 /**
  * AgentGuard Example Usage
  * Shows how to integrate AgentGuard into a real AI agent
+ * 
+ * FOR NPM USERS:
+ * Replace the require line below with: const agentGuard = require('agent-guard');
+ * 
+ * FOR LOCAL/GITHUB USERS:
+ * Use the current require path: require('../agent-guard')
  */
 
 // Initialize AgentGuard FIRST - before any other imports
+// Use require('agent-guard') if you installed via NPM
 const agentGuard = require('../agent-guard');
 const guard = agentGuard.init({ 
   limit: 25,  // $25 limit for production agent

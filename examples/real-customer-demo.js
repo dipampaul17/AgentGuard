@@ -30,6 +30,7 @@ class CustomerAgent {
     
     if (hasProtection) {
       // THE ONLY LINE CUSTOMERS ADD:
+      // Use require('agent-guard') if installed via NPM
       const agentGuard = require('../agent-guard');
       this.guard = agentGuard.init({ limit: 1.5 });
       console.log(`${styles.success}🛡️  AgentGuard protection enabled${styles.reset}`);

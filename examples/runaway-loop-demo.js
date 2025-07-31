@@ -5,9 +5,13 @@
  * This simulates what happens when an agent gets stuck in an infinite loop
  * WITHOUT AgentGuard: $500+ burned overnight
  * WITH AgentGuard: Killed at $3, saves $497+
+ * 
+ * FOR NPM USERS:
+ * Replace require line with: const agentGuard = require('agent-guard');
  */
 
 // Initialize AgentGuard with LOW limit for dramatic demo
+// Use require('agent-guard') if you installed via NPM
 const agentGuard = require('../agent-guard');
 const guard = agentGuard.init({ 
   limit: 3.0,  // Low limit to trigger kill switch quickly

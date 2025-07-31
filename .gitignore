@@ -32,6 +32,7 @@ DEMO_RESULTS.md
 production-test.js
 *-test.js
 test-*.js
+test-npm-package.js
 
 # Build artifacts
 dist/

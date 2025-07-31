@@ -4,6 +4,7 @@
 
 **Stop AI agents from burning your money**
 
+[![npm version](https://badge.fury.io/js/agent-guard.svg)](https://badge.fury.io/js/agent-guard)
 [![License: MIT](https://img.shields.io/badge/License-MIT-yellow.svg)](https://opensource.org/licenses/MIT)
 [![Node.js](https://img.shields.io/badge/node-%3E%3D12.0.0-brightgreen)](https://nodejs.org/)
 [![GitHub stars](https://img.shields.io/github/stars/dipampaul17/AgentGuard?style=social)](https://github.com/dipampaul17/AgentGuard)
@@ -31,7 +32,7 @@ AgentGuard is a **lightweight kill switch** that monitors your AI agent costs in
 const response = await openai.chat.completions.create({...});
 
 // After: Protected by AgentGuard
-const agentGuard = require('./agent-guard');
+const agentGuard = require('agent-guard');
 agentGuard.init({ limit: 50 });
 const response = await openai.chat.completions.create({...});
 // 🛡️ AgentGuard now monitors every API call automatically
@@ -51,26 +52,27 @@ const response = await openai.chat.completions.create({...});
 
 ### Installation
 
-**Option 1: Direct from GitHub (Recommended)**
+**Option 1: NPM (Recommended)**
 ```bash
-# Clone the repository
-git clone https://github.com/dipampaul17/AgentGuard.git
-cd AgentGuard
-
-# Copy agent-guard.js to your project
-cp agent-guard.js /path/to/your/project/
+npm install agent-guard
 ```
 
-**Option 2: Download single file**
+**Option 2: Direct download**
 ```bash
 # Download just the core file (11KB)
 curl -O https://raw.githubusercontent.com/dipampaul17/AgentGuard/main/agent-guard.js
 ```
 
+**Option 3: Clone repository**
+```bash
+git clone https://github.com/dipampaul17/AgentGuard.git
+cd AgentGuard
+```
+
 ### Usage
 ```javascript
 // Add this ONE line at the start of your agent
-const agentGuard = require('./agent-guard');
+const agentGuard = require('agent-guard');
 agentGuard.init({ limit: 25 }); // Kill at $25
 
 // Your existing agent code continues unchanged
@@ -98,14 +100,14 @@ console.log('Response:', response); // AgentGuard tracks this automatically
 
 ### Basic Protection
 ```javascript
-const agentGuard = require('./agent-guard');
+const agentGuard = require('agent-guard');
 agentGuard.init({ limit: 10 });
 // Process kills automatically at $10
 ```
 
 ### Advanced Configuration
 ```javascript
-const agentGuard = require('./agent-guard');
+const agentGuard = require('agent-guard');
 const guard = agentGuard.init({
   limit: 100,                              // Kill at $100
   webhook: 'https://hooks.slack.com/...',  // Slack notifications
@@ -171,7 +173,7 @@ AgentGuard intercepts and monitors:
 Initializes AgentGuard with the specified options.
 
 ```javascript
-const agentGuard = require('./agent-guard');
+const agentGuard = require('agent-guard');
 const guard = agentGuard.init({
   limit: 50,           // Cost limit in USD
   webhook: null,       // Webhook URL for notifications
@@ -215,7 +217,7 @@ MIT - Use anywhere, even commercial projects.
 **Stop losing money. Start shipping safely.**
 
 [⭐ Star on GitHub](https://github.com/dipampaul17/AgentGuard) • 
-[📥 Download](https://raw.githubusercontent.com/dipampaul17/AgentGuard/main/agent-guard.js) • 
+[📦 NPM Package](https://npmjs.com/package/agent-guard) • 
 [📖 Quick Start](QUICKSTART.md)
 
 *Trusted by developers building the future of AI*

@@ -4,7 +4,15 @@
  * AgentGuard Installation Test
  * Run this to verify AgentGuard works on your system
  * 
- * Usage: node test-installation.js
+ * FOR NPM USERS:
+ * 1. npm install agent-guard
+ * 2. Change require line below to: require('agent-guard')
+ * 3. node verify-installation.js
+ * 
+ * FOR LOCAL USERS:
+ * 1. Download agent-guard.js to this directory
+ * 2. Keep require line as: require('./agent-guard')
+ * 3. node verify-installation.js
  */
 
 console.log('🧪 Testing AgentGuard installation...\n');
@@ -12,6 +20,7 @@ console.log('🧪 Testing AgentGuard installation...\n');
 try {
   // Test 1: Module loads
   console.log('✅ Test 1: Loading AgentGuard module...');
+  // Use require('agent-guard') if you installed via NPM
   const agentGuard = require('./agent-guard');
   console.log('   ✅ Module loaded successfully');
 
@@ -90,7 +99,9 @@ try {
     console.log('   ✅ Configuration works');
     console.log('\n🛡️ Your agents are now protected!');
     console.log('\n💡 Next steps:');
-    console.log('   1. Add AgentGuard to your agent: const agentGuard = require("./agent-guard")');
+    console.log('   1. Add AgentGuard to your agent:');
+    console.log('      NPM: const agentGuard = require("agent-guard")');
+    console.log('      Local: const agentGuard = require("./agent-guard")');
     console.log('   2. Initialize with your limit: agentGuard.init({ limit: 50 })');
     console.log('   3. Run your agent normally - AgentGuard will protect it automatically');
 
