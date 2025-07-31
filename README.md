@@ -2,56 +2,54 @@
 
 # 🛡️ AgentGuard
 
-**Stop AI agents from burning your money**
+**Real-time cost monitoring for AI agents**
 
 [![npm version](https://img.shields.io/npm/v/agent-guard.svg)](https://npmjs.com/package/agent-guard)
 [![License: MIT](https://img.shields.io/badge/License-MIT-yellow.svg)](https://opensource.org/licenses/MIT)
 [![Node.js](https://img.shields.io/badge/node-%3E%3D12.0.0-brightgreen)](https://nodejs.org/)
-[![GitHub stars](https://img.shields.io/github/stars/dipampaul17/AgentGuard?style=social)](https://github.com/dipampaul17/AgentGuard)
 
-*The emergency brake for runaway AI costs*
+*Two lines of code. Automatic cost tracking. No surprises.*
 
 </div>
 
 ---
 
-## 🚨 The Problem
+## The Problem
 
-Every AI developer has been there:
-- 🔥 **Infinite loop** burns through $500 overnight
-- 📈 **Development costs** exceed the solution  
-- 💳 **OpenAI bills** that make you cry
-- 😰 **Deploy anxiety** because agents can go rogue
+Building AI agents? Your biggest fear is probably this:
+- **Runaway costs** from infinite loops or bugs
+- **Development bills** that spiral out of control  
+- **No visibility** into what your agent is actually spending
+- **Production anxiety** about deploying autonomous systems
 
-## ✨ The Solution
+## The Solution
 
-AgentGuard is a **production-ready kill switch** that monitors your AI agent costs in real-time and automatically terminates processes when they exceed your budget. **Battle-tested** with comprehensive test coverage and CI/CD pipelines.
+AgentGuard automatically tracks your AI API costs in real-time and stops execution when you hit your budget. No code changes needed - just add two lines and keep building.
 
 ```javascript
-// Before: Vulnerable to runaway costs
-const response = await openai.chat.completions.create({...});
-
-// After: Protected by AgentGuard
+// Add these two lines to any AI agent:
 const agentGuard = require('agent-guard');
 await agentGuard.init({ limit: 50 });
+
+// Your existing code works unchanged:
 const response = await openai.chat.completions.create({...});
-// 🛡️ AgentGuard now monitors every API call automatically
+console.log(response); // ← AgentGuard automatically tracks this
+
+// Real-time cost display:
+// 💸 $12.34 / $50  24.7%
 ```
 
-## 🎯 Key Features
+## What It Does
 
-- **🔥 Minimal Dependencies** - Lightweight ~18KB core file with optional tokenizers
-- **⚡ Zero Configuration** - Works out of the box
-- **🎨 Beautiful Terminal UI** - Real-time cost display with warnings  
-- **🤖 Multi-Model Support** - OpenAI, Anthropic, Claude, GPT-4o
-- **🌐 Multi-Platform** - Node.js and Browser with TypeScript support
-- **🚨 Instant Kill Switch** - Terminates at your cost limit
-- **📊 Accurate Tracking** - Real token counting and pricing
-- **✅ Production Ready** - Comprehensive test suite, CI/CD, stable release
+- **Automatic tracking** - Watches console.log, fetch, and axios automatically
+- **Real-time display** - Shows current costs as your agent runs  
+- **Multi-model support** - OpenAI (GPT-4, GPT-3.5), Anthropic (Claude), embeddings
+- **Flexible limits** - Set budget in dollars, auto-kill or just warn
+- **Zero code changes** - Works with your existing OpenAI/Anthropic code
+- **TypeScript support** - Full type definitions included
+- **18KB lightweight** - No bloat, minimal dependencies
 
-## 🚀 Quick Start
-
-Ready to protect your AI budget in 30 seconds? 
+## Quick Start
 
 ### Installation
 
@@ -207,31 +205,31 @@ node verify-installation.js
 
 MIT - Use anywhere, even commercial projects.
 
-## 🆘 Support
+## Support
 
-- 📧 **Issues**: [GitHub Issues](https://github.com/dipampaul17/AgentGuard/issues)
-- 💬 **Questions**: [GitHub Discussions](https://github.com/dipampaul17/AgentGuard/discussions)
-- 🐛 **Bug Reports**: [Bug Report Template](https://github.com/dipampaul17/AgentGuard/issues/new)
+Having issues? Found a bug? 
 
-## 📋 What's New in v1.1.0
+- [GitHub Issues](https://github.com/dipampaul17/AgentGuard/issues) for bugs
+- [GitHub Discussions](https://github.com/dipampaul17/AgentGuard/discussions) for questions
 
-- ✅ **Fixed CI/CD Issues** - Resolved all test timing issues for reliable deployments
-- 🔧 **Enhanced Test Suite** - Comprehensive testing with 200ms wait times for CI environments  
-- 🚀 **Production Stability** - Battle-tested codebase ready for enterprise use
-- 📦 **NPM Ready** - Clean package with only essential files (31.8kB total)
-- 🛡️ **Zero Gaps** - Every claimed feature is fully implemented and tested
+## What's Included
+
+- **Core monitoring** - Tracks OpenAI, Anthropic, and embedding costs
+- **Working examples** - Real LangChain integration, runaway loop demo
+- **TypeScript support** - Full type definitions
+- **Browser build** - Use in web applications
+- **Verification script** - Test installation instantly
 
 ---
 
 <div align="center">
 
-**🛡️ AgentGuard v1.1.0 - Stop losing money. Start shipping safely.**
+**AgentGuard - Real-time cost monitoring for AI agents**
 
-**Production-ready | CI/CD tested | Zero gaps**
+*Two lines of code. Automatic tracking. No surprises.*
 
 [⭐ Star on GitHub](https://github.com/dipampaul17/AgentGuard) • 
-[📦 NPM Package](https://npmjs.com/package/agent-guard) • 
-[📖 Quick Start](QUICKSTART.md)
+[📦 NPM Package](https://npmjs.com/package/agent-guard)
 
 *Trusted by developers building the future of AI*
 
