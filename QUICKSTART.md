@@ -20,9 +20,9 @@ agentGuard.init({ limit: 10 });
 // AgentGuard now protects everything below
 ```
 
-## 3. Test it works
+## 3. Verify it works
 ```bash
-node test-agent.js
+node verify-installation.js
 ```
 Watch the cost counter: `💸 $0.12... $0.45... $0.89...`
 

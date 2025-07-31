@@ -1,14 +1,14 @@
 #!/usr/bin/env node
 
 /**
- * REAL CUSTOMER WORKFLOW DEMO
+ * CUSTOMER WORKFLOW EXAMPLE
  * Shows exactly how YC startups integrate AgentGuard
  * 
  * BEFORE: Customer has working agent that makes API calls
  * AFTER: Customer adds ONE LINE and gets cost protection
  */
 
-console.log('\n🏢 YC STARTUP DEMO: Before vs After AgentGuard\n');
+console.log('\n🏢 YC STARTUP EXAMPLE: Before vs After AgentGuard\n');
 
 // ================================
 // CUSTOMER'S EXISTING AGENT CODE
@@ -122,10 +122,10 @@ class CustomerAgent {
 }
 
 // ================================
-// THE DEMO: BEFORE vs AFTER
+// THE EXAMPLE: BEFORE vs AFTER
 // ================================
 
-async function runDemo() {
+async function runExample() {
   console.log(`${styles.info}═══════════════════════════════════════════${styles.reset}`);
   console.log(`${styles.info} SCENARIO: Customer Support Document Processor${styles.reset}`);
   console.log(`${styles.info}═══════════════════════════════════════════${styles.reset}\n`);
@@ -173,12 +173,12 @@ async function runDemo() {
 
 // Handle interruption
 process.on('SIGINT', () => {
-  console.log('\n\n' + styles.warning + '⏹️  Demo interrupted' + styles.reset);
+  console.log('\n\n' + styles.warning + '⏹️  Example interrupted' + styles.reset);
   process.exit(0);
 });
 
-// Run the compelling demo
-runDemo().catch(error => {
-  console.error(`\n${styles.danger}💥 Demo failed: ${error.message}${styles.reset}`);
+// Run the customer example
+runExample().catch(error => {
+  console.error(`\n${styles.danger}💥 Example failed: ${error.message}${styles.reset}`);
   process.exit(1);
 });

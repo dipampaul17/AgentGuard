@@ -1,16 +1,19 @@
 #!/usr/bin/env node
 
 /**
- * RUNAWAY LOOP DEMO - The Nightmare Every YC Startup Fears
- * This simulates what happens when an agent gets stuck in an infinite loop
- * WITHOUT AgentGuard: $500+ burned overnight
- * WITH AgentGuard: Killed at $3, saves $497+
+ * RUNAWAY LOOP PROTECTION EXAMPLE
+ * 
+ * This example demonstrates AgentGuard's protection against infinite loops.
+ * Simulates a common scenario where agents get stuck in recursive calls.
+ * 
+ * WITHOUT AgentGuard: Potential for unlimited cost escalation
+ * WITH AgentGuard: Automatic termination at predefined limit
  * 
  * FOR NPM USERS:
  * Replace require line with: const agentGuard = require('agent-guard');
  */
 
-// Initialize AgentGuard with LOW limit for dramatic demo
+// Initialize AgentGuard with low limit for quick demonstration
 // Use require('agent-guard') if you installed via NPM
 const agentGuard = require('../agent-guard');
 const guard = agentGuard.init({ 
@@ -29,7 +32,7 @@ const styles = {
   box: '█'
 };
 
-function printDramaticHeader() {
+function printHeader() {
   console.log('\n' + styles.danger + styles.box.repeat(80) + styles.reset);
   console.log(styles.danger + '██' + ' '.repeat(20) + 'RUNAWAY LOOP SIMULATION' + ' '.repeat(20) + '██' + styles.reset);
   console.log(styles.danger + '██' + ' '.repeat(15) + 'What Happens To YC Startups' + ' '.repeat(15) + '██' + styles.reset);
@@ -130,7 +133,7 @@ class RunawayRAGAgent {
   }
 
   async startRunawayLoop() {
-    printDramaticHeader();
+    printHeader();
     
     console.log(`${styles.info}🚀 Starting document processing agent...${styles.reset}\n`);
     
@@ -209,23 +212,23 @@ class RunawayRAGAgent {
   }
 }
 
-// Start the dramatic demo
+// Start the protection example
 const agent = new RunawayRAGAgent();
 agent.startTime = Date.now();
 
 process.on('SIGINT', () => {
-  console.log('\n\n' + styles.warning + '⏹️  Demo interrupted by user' + styles.reset);
+  console.log('\n\n' + styles.warning + '⏹️  Example interrupted by user' + styles.reset);
   agent.showStats(false);
   process.exit(0);
 });
 
-console.log(styles.warning + '\n⚠️  WARNING: This demo simulates a runaway loop that burns money' + styles.reset);
+console.log(styles.warning + '\n⚠️  WARNING: This example simulates a runaway loop that burns money' + styles.reset);
 console.log(styles.info + '🛡️  AgentGuard will kill it at $3 to demonstrate protection' + styles.reset);
 console.log(styles.dim + '⏱️  Starting in 3 seconds...\n' + styles.reset);
 
 setTimeout(() => {
   agent.startRunawayLoop().catch(error => {
-    console.error(`\n${styles.danger}💥 Demo crashed: ${error.message}${styles.reset}`);
+    console.error(`\n${styles.danger}💥 Example failed: ${error.message}${styles.reset}`);
     process.exit(1);
   });
 }, 3000);

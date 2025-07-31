@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>AgentGuard Browser Test</title>
+    <title>AgentGuard Browser Example</title>
     <style>
         body {
             font-family: 'Monaco', 'Menlo', 'Ubuntu Mono', monospace;
@@ -62,7 +62,7 @@
 </head>
 <body>
     <div class="container">
-        <h1>🛡️ AgentGuard Browser Test</h1>
+        <h1>🛡️ AgentGuard Browser Example</h1>
         
         <p>This page demonstrates AgentGuard protecting against expensive AI agent loops in the browser.</p>
         
@@ -79,12 +79,12 @@
         </div>
 
         <div class="terminal" id="terminal">
-            <div>Welcome to AgentGuard Browser Test</div>
+            <div>Welcome to AgentGuard Browser Example</div>
             <div>Click "Initialize AgentGuard" to start...</div>
         </div>
     </div>
 
-    <!-- Option 1: Local file (for this demo) -->
+    <!-- Option 1: Local file (for this example) -->
     <script src="../agent-guard.js"></script>
     
     <!-- Option 2: CDN (for production) -->
@@ -110,7 +110,7 @@
                 guard = AgentGuard.init({
                     limit: 10.0,
                     silent: false,
-                    webhook: null // Could set up a test webhook here
+                    webhook: null // Could set up a webhook here
                 });
                 
                 log('✅ AgentGuard initialized with $10 limit', 'success');
@@ -265,7 +265,7 @@
 
         // Auto-initialize on page load
         window.addEventListener('load', () => {
-            log('🌐 Page loaded. Ready for AgentGuard demo.');
+            log('🌐 Page loaded. Ready for AgentGuard example.');
             log('💡 This simulates browser-based AI agents that could run expensive loops.');
         });
 

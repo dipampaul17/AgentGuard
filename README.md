@@ -19,7 +19,7 @@
 
 Every AI developer has been there:
 - 🔥 **Infinite loop** burns through $500 overnight
-- 📈 **Debugging costs** more than the bug  
+- 📈 **Development costs** exceed the solution  
 - 💳 **OpenAI bills** that make you cry
 - 😰 **Deploy anxiety** because agents can go rogue
 
@@ -130,16 +130,16 @@ guard.setLimit(200);
 </script>
 ```
 
-## 🎭 Live Demo
+## 🎯 Live Examples
 
-Want to see AgentGuard in action? Check out our demos:
+Want to see AgentGuard in action? Check out our examples:
 
-- **[Runaway Loop Demo](examples/runaway-loop-demo.js)** - See protection against infinite loops
-- **[Customer Support Agent](examples/real-customer-demo.js)** - Real-world RAG scenario
-- **[Browser Demo](examples/test-browser.html)** - Interactive web interface
+- **[Runaway Loop Protection](examples/runaway-loop-demo.js)** - See protection against infinite loops
+- **[Customer Workflow](examples/real-customer-demo.js)** - Real-world integration scenario
+- **[Browser Example](examples/test-browser.html)** - Interactive web interface
 
 ```bash
-# Run the dramatic runaway loop demo
+# Run the runaway loop protection example
 node examples/runaway-loop-demo.js
 
 # See real customer workflow protection  
@@ -164,7 +164,7 @@ AgentGuard intercepts and monitors:
 - 🛡️ **Infinite loops** calling AI APIs
 - 🛡️ **Expensive model calls** (GPT-4, Claude Opus)
 - 🛡️ **Recursive agent calls** with bugs
-- 🛡️ **Development debugging** sessions
+- 🛡️ **Development workflows** with cost oversight
 - 🛡️ **Runaway RAG** document processing
 
 ## 🛠️ API Reference
@@ -197,7 +197,7 @@ We love contributions! See our [Contributing Guide](CONTRIBUTING.md) for details
 ```bash
 git clone https://github.com/dipampaul17/AgentGuard.git
 cd AgentGuard
-npm test
+node verify-installation.js
 ```
 
 ## 📜 License

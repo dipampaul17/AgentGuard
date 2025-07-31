@@ -1,7 +1,7 @@
 #!/usr/bin/env node
 
 /**
- * AgentGuard Installation Test
+ * AgentGuard Installation Verification
  * Run this to verify AgentGuard works on your system
  * 
  * FOR NPM USERS:
@@ -15,25 +15,25 @@
  * 3. node verify-installation.js
  */
 
-console.log('🧪 Testing AgentGuard installation...\n');
+console.log('🔍 Verifying AgentGuard installation...\n');
 
 try {
-  // Test 1: Module loads
-  console.log('✅ Test 1: Loading AgentGuard module...');
+  // Step 1: Module loads
+  console.log('✅ Step 1: Loading AgentGuard module...');
   // Use require('agent-guard') if you installed via NPM
   const agentGuard = require('./agent-guard');
   console.log('   ✅ Module loaded successfully');
 
-  // Test 2: Initialization works
-  console.log('\n✅ Test 2: Initializing AgentGuard...');
+  // Step 2: Initialization works
+  console.log('\n✅ Step 2: Initializing AgentGuard...');
   const guard = agentGuard.init({ 
-    limit: 0.50,  // Low limit for quick test
+    limit: 0.50,  // Low limit for quick verification
     silent: false 
   });
   console.log('   ✅ Initialization successful');
 
-  // Test 3: API methods available
-  console.log('\n✅ Test 3: Checking API methods...');
+  // Step 3: API methods available
+  console.log('\n✅ Step 3: Checking API methods...');
   const methods = ['getCost', 'getLimit', 'setLimit', 'disable', 'getLogs', 'reset'];
   methods.forEach(method => {
     if (typeof guard[method] === 'function') {
@@ -43,12 +43,12 @@ try {
     }
   });
 
-  // Test 4: Cost tracking works
-  console.log('\n✅ Test 4: Testing cost tracking...');
+  // Step 4: Cost tracking works
+  console.log('\n✅ Step 4: Verifying cost tracking...');
   
   // Simulate API response that AgentGuard should track
-  const testResponse = {
-    id: 'chatcmpl-test',
+  const sampleResponse = {
+    id: 'chatcmpl-verification',
     object: 'chat.completion',
     model: 'gpt-4',
     usage: {
@@ -59,14 +59,14 @@ try {
     choices: [{
       message: {
         role: 'assistant',
-        content: 'Test response for AgentGuard verification'
+        content: 'Sample response for AgentGuard verification'
       },
       finish_reason: 'stop'
     }]
   };
 
   console.log('   📞 Simulating API call...');
-  console.log('OpenAI Response:', testResponse);
+  console.log('OpenAI Response:', sampleResponse);
 
   // Small delay to let AgentGuard process
   setTimeout(() => {
@@ -76,13 +76,13 @@ try {
     if (currentCost > 0) {
       console.log(`   ✅ Cost tracking works: $${currentCost.toFixed(4)}`);
     } else {
-      console.log('   ⚠️  Cost tracking: $0.0000 (may not have intercepted test call)');
+      console.log('   ⚠️  Cost tracking: $0.0000 (may not have intercepted sample call)');
     }
     
     console.log(`   ✅ Logs captured: ${logs.length} API calls`);
 
-    // Test 5: Configuration works
-    console.log('\n✅ Test 5: Testing configuration...');
+    // Step 5: Configuration works
+    console.log('\n✅ Step 5: Verifying configuration...');
     console.log(`   ✅ Current limit: $${guard.getLimit()}`);
     console.log(`   ✅ Current cost: $${guard.getCost().toFixed(4)}`);
     
@@ -109,11 +109,11 @@ try {
   }, 1000);
 
 } catch (error) {
-  console.log('\n❌ FAILED: AgentGuard installation test failed');
+  console.log('\n❌ FAILED: AgentGuard installation verification failed');
   console.log(`   Error: ${error.message}`);
   console.log('\n🔧 Troubleshooting:');
   console.log('   1. Make sure agent-guard.js is in the same directory');
   console.log('   2. Download it with: curl -O https://raw.githubusercontent.com/dipampaul17/AgentGuard/main/agent-guard.js');
-  console.log('   3. Run this test again: node test-installation.js');
+  console.log('   3. Run this verification again: node verify-installation.js');
   process.exit(1);
 }
